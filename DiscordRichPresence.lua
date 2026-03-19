@@ -67,7 +67,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 	-- Show CS rank
 	if managers.crime_spree and managers.crime_spree:is_active() then
 		crime_spree_active = true
-		DRP:SetLargeImage("crime_spree_test", job_name)
+		DRP:SetLargeImage("crime_spree", job_name)
 		if name ~= "MPLobby" then -- Don't show host rank in lobby
 			job_name = job_name .. loc:text("discord_rp_cs_rank_string") .. tostring(managers.crime_spree:server_spree_level())
 		end
@@ -75,7 +75,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 	-- Add Holdout prefix
 	if managers.skirmish and managers.skirmish:is_skirmish() then
 		job_name = loc:text("menu_skirmish") .. " - " .. job_name
-		DRP:SetLargeImage("skirmish_test", loc:text("menu_skirmish"))
+		DRP:SetLargeImage("skirmish", loc:text("menu_skirmish"))
 		holdout_active = true
 	end
 	
@@ -261,3 +261,16 @@ function WinPlatformManager:update_discord_heist()
         Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
 	end
 end
+
+--[[ Branch, car shop, go bank, Alesso, trans harbor, trans park, 
+Hostile
+Counterfeit Heat Street No mercy
+Mid ranch
+Firestarter 
+Dragon heist Ukrainian prsioner
+Beneath Birth BorderMeth Breakfast Brooklyn bank 
+Yacht
+Big bank DaDiamond
+Election Biker heist
+Black cat Buluc Four stores Goat Nightclub San Martion Stealing xmas 
+--]]

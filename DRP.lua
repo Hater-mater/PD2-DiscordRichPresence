@@ -135,6 +135,8 @@ function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
 				local level_id = Global.game_settings.level_id				
 				if level_id == "election_day_3_skip1" or level_id == "election_day_3_skip2" or level_id == "level_election_day_3" then
 					id = id .. "_" .. "3"
+				else
+					id = id .. "_" .. day
 				end
 			else
 				id = id .. "_" .. day
