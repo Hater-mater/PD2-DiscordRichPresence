@@ -1,0 +1,26 @@
+{
+	"name": "Discord Rich Presence",
+	"description": "Custom PD2 Discord Rich Presence",
+	"author": "Hater",
+	"contact": "hater_mater in Discord",
+	"version": "0.1",
+	"blt_version": 2,
+	"image": "thefan.png",
+	"hooks": [
+		{"hook_id": "lib/states/menumainstate",	"script_path": "DRP.lua"},
+		{"hook_id": "lib/managers/menumanager",	"script_path": "DRP.lua"},
+		{"hook_id":"lib/managers/menu/menunodegui", "script_path": "DRP.lua"},
+		{"hook_id":"lib/managers/platformmanager", "script_path":"DiscordRichPresence.lua"},
+		{"hook_id":"lib/setups/setup", "script_path":"setup.lua"},
+		{"hook_id":"lib/managers/group_ai_states/groupaistatebase", "script_path":"groupaistatebase.lua"}
+	],
+	"updates" : [
+		{
+			"identifier" : "pd2drp",
+			"host" : {
+				"meta" : "https://raw.githubusercontent.com/Hater-mater/PD2-DiscordRichPresence/main/meta.json"
+			}
+		}
+	]
+}
+}

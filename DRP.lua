@@ -1,0 +1,345 @@
+_G.DiscordRichPresenceMod = {
+	mod_path = ModPath,
+	save_path = SavePath,
+	save_name = "DiscordRichPresenceMod.json",
+	settings = {
+		heister_icon = 1,
+		use_overhaul_tag = true,
+		--use_rpd_string = false, -- Will make compatibility later
+	},
+}
+
+local vanilla_heists = {
+	"no_briefheist",
+	"jewelry_store",
+	"four_stores",
+	"nightclub",
+	"mallcrasher",
+	"ukrainian_job",
+	"branchbank_deposit",
+	"branchbank_cash",
+	"branchbank",
+	"branchbank_gold",
+	"firestarter",
+	"alex",
+	"watchdogs",
+	"watchdogs_night",
+	"framing_frame",
+	"welcome_to_the_jungle",
+	"family",
+	"election_day",
+	"kosugi",
+	"arm_fac",
+	"arm_par",
+	"arm_hcm",
+	"arm_und",
+	"arm_cro",
+	"arm_for",
+	"big",
+	"mia",
+	"gallery",
+	"hox",
+	"hox_3",
+	"pines",
+	"cage",
+	"mus",
+	"crojob1",
+	"crojob2",
+	"rat",
+	"shoutout_raid",
+	"arena",
+	"kenaz",
+	"jolly",
+	"red2",
+	"dinner",
+	"nail",
+	"cane",
+	"pbr",
+	"pbr2",
+	"peta",
+	"pal",
+	"man",
+	"mad",
+	"dark",
+	"born",
+	"chill",
+	"chill_combat",
+	"friend",
+	"flat",
+	"help",
+	"haunted",
+	"spa",
+	"fish",
+	"moon",
+	"run",
+	"glace",
+	"dah",
+	"rvd",
+	"hvh",
+	"wwh",
+	"brb",
+	"tag",
+	"des",
+	"nmh",
+	"sah",
+	"vit",
+	"bph",
+	"mex",
+	"mex_cooking",
+	"bex",
+	"pex",
+	"fex",
+	"chas",
+	"sand",
+	"chca",
+	"pent",
+	"ranc",
+	"trai",
+	"corp",
+	"deep"
+}
+
+function DiscordRichPresenceMod:InitDiscord()	
+	Discord:set_large_image("jerome", "Jerome")
+	Discord:set_small_image("like", "DRP init")
+	
+	Discord:set_start_time(0)
+end
+
+function DiscordRichPresenceMod:SetDiscordPresence(desc, game_status)
+	Discord:set_status(tostring(game_status), tostring(desc))
+end
+
+function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
+	if not is_heist then
+		Discord:set_large_image(id, text)
+	else
+		local custom_heist = true
+		for _, value in ipairs(vanilla_heists) do
+			value = "heist_" .. value
+			if value == id or id == "no_briefheist" then
+				custom_heist = false
+				break
+			end
+		end
+		if custom_heist then
+			id = "heist_unknown"
+			Discord:set_large_image(id, text)
+			return
+		end
+		
+		if day then
+			--Workaround for Election Day
+			if id == "heist_election_day" then
+				local level_id = Global.game_settings.level_id				
+				if level_id == "election_day_3_skip1" or level_id == "election_day_3_skip2" or level_id == "level_election_day_3" then
+					id = id .. "_" .. "3"
+				end
+			else
+				id = id .. "_" .. day
+			end
+		end
+		if string.find(id, "heist_branchbank") then
+			id = "heist_branchbank"
+		end
+		Discord:set_large_image(id, text)
+	end
+end
+
+-- Overhaul tag definition. Unlike RPD - there will be no http requests due no Dev branch check, maybe add in the future if people would request but idk
+function DiscordRichPresenceMod:set_overhaul_tag()
+	local tag = "Vanilla"
+	
+	if not _G.DiscordRichPresenceMod.settings.use_overhaul_tag then
+		tag = ""
+		return tag
+	end
+	
+	-- Resmod
+	if _G.SC then
+		tag = "Restoration Mod"
+	-- Hyper Heisting
+	elseif _G.PD2THHSHIN then
+		tag = "Hyper Heisting"	
+	-- Crackdown
+	elseif _G.deathvox then
+		tag = "Crackdown"	
+	-- Classic Heisting
+	elseif _G.ch_settings then
+		tag = "Classic Heisting"	
+	-- Streamlined Heisting
+	elseif _G.StreamHeist then
+		tag = "Streamlined Heisting"	
+	-- Original Pack
+	elseif _G.OriginalPackOptions then
+		tag = "Original Pack"	
+	--Eclipse
+	elseif _G.EclipseDebug or _G.Eclipse then
+		tag = "Eclipse"	
+	-- Heat (it's fucking DEAD)
+	elseif _G.heat then
+		tag = "HEAT"	
+	-- NQR
+	elseif _G.NQR then
+		tag = "NQR"
+	end
+	
+	-- Nuke tag if no overhaul detected
+	if tag == "Vanilla" then
+		tag = ""
+	end
+	
+	return tag
+end
+
+if Hooks then
+	Hooks:Add("SetupInitManagers", "PostInitManager_DiscordRichPresenceMod", function()
+		DiscordRichPresenceMod:InitDiscord()
+	end)
+end
+
+Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)		
+	LocalizationManager:add_localized_strings({
+		-- Strings for Discord
+		--discord_rp_vanilla_string = "Vanilla",
+		discord_rp_ingame_string = "In-game",
+		discord_rp_lobby_string = "Lobby",
+		discord_rp_preplanning_string = "Preplanning",
+		discord_rp_cs_rank_string = " Rank ",
+		discord_rp_mainmenu_string = "Main Menu",
+		discord_rp_noheist_string = "No Heist Selected",
+		-- Menu strings
+		menu_DiscordRichPresenceMod = "Discord Rich Presence",
+		
+		menu_heister_icon_multiple_choice = "Heister Icon",
+		menu_heister_icon_multiple_choice_desc = "Choose which heister icon style will be presented in Discord Rich Presence",
+		--heister_icon_vanilla = "Vanilla",
+		heister_icon_vanilla_masks = "Masks",
+		heister_icon_polaroid_v1 = "Polaroid Masked",
+		heister_icon_polaroid_v2 = "Polaroid Unmasked",
+		heister_icon_colored = "Colored Masks",
+		heister_icon_safehouse = "Safehouse Icons",
+		heister_icon_fbi = "FBI Files Sketches",
+		
+		menu_use_rpd_string = "Build Discord RP string by using RPD string",
+		menu_use_rpd_string_desc = "Discord Rich Presence will show your status generated by RPD mod.",
+		
+		menu_use_overhaul_tag = "Overhaul Tag",
+		menu_use_overhaul_tag_desc = "Show overhaul tag in Discord Rich Presence.",
+	})
+	
+	if Idstring("russian"):key() == SystemInfo:language():key() then
+		LocalizationManager:add_localized_strings({
+			-- Strings for Discord
+			--discord_rp_vanilla_string = "Ванилла",
+			discord_rp_ingame_string = "В игре",
+			discord_rp_lobby_string = "Лобби",
+			discord_rp_preplanning_string = "Препланнинг",
+			discord_rp_cs_rank_string = " Ранг ",
+			discord_rp_mainmenu_string = "Главное меню",
+			discord_rp_noheist_string = "Ограбление не выбрано",
+			-- Menu strings
+			menu_DiscordRichPresenceMod = "Discord Rich Presence",
+			
+			menu_heister_icon_multiple_choice = "Heister Icon",
+			menu_heister_icon_multiple_choice_desc = "Choose which heister icon style will be presented in Discord Rich Presence",
+			--heister_icon_vanilla = "Vanilla",
+			heister_icon_vanilla_masks = "Masks",
+			heister_icon_polaroid_v1 = "Polaroid Masked",
+			heister_icon_polaroid_v2 = "Polaroid Unmasked",
+			heister_icon_colored = "Colored Masks",
+			heister_icon_safehouse = "Safehouse Icons",
+			heister_icon_fbi = "FBI Files Sketches",
+			
+			menu_use_rpd_string = "Build Discord RP string by using RPD string",
+			menu_use_rpd_string_desc = "Discord Rich Presence will show your status generated by RPD mod.",
+			
+			menu_use_overhaul_tag = "Overhaul Tag",
+			menu_use_overhaul_tag_desc = "Show overhaul tag in Discord Rich Presence.",
+		})
+	end
+end)
+
+function DiscordRichPresenceMod:Save()
+	local DRP = _G.DiscordRichPresenceMod
+	local file = io.open(DRP.save_path..DRP.save_name, "w+")
+	if file then
+		file:write(json.encode(self.settings))
+		file:close()
+	end
+end
+
+function DiscordRichPresenceMod:Load()
+	local DRP = _G.DiscordRichPresenceMod
+	local file = io.open(DRP.save_path..DRP.save_name, "r")
+	if file then
+		for k, v in pairs(json.decode(file:read("*all")) or {}) do
+			self.settings[k] = v
+		end
+		file:close()
+	else
+		self:Save()
+	end
+end
+
+Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_DiscordRichPresenceMod", function(...)
+	DiscordRichPresenceMod:Load()
+	MenuHelper:LoadFromJsonFile(DiscordRichPresenceMod.mod_path .. "DiscordRichPresenceMod.json", DiscordRichPresenceMod, DiscordRichPresenceMod.settings)
+end)
+
+Hooks:Add("MenuManagerBuildCustomMenus", "MenuManagerBuildCustomMenusDiscordRichPresenceMod", function(menu_manager, nodes)
+	function MenuCallbackHandler:drp_heister_icon_callback(item)
+		DiscordRichPresenceMod.settings.heister_icon = item:value()
+		DiscordRichPresenceMod:Save()
+	end
+	
+	function MenuCallbackHandler:drp_toggle_callback(item)
+		DiscordRichPresenceMod.settings[item:name()] = item:value() == "on"
+		DiscordRichPresenceMod:Save()
+	end
+
+	local menu_id = "DiscordRichPresenceMod_options"
+	MenuHelper:NewMenu(menu_id)
+
+	MenuHelper:AddMultipleChoice({
+		id = "heister_icon_multiple_choice",
+		title = "menu_heister_icon_multiple_choice",
+		desc = "menu_heister_icon_multiple_choice_desc",
+		callback = "drp_heister_icon_callback",
+		items = {
+			"heister_icon_vanilla_masks",
+			"heister_icon_colored",
+			"heister_icon_polaroid_v1",
+			"heister_icon_polaroid_v2",			
+			"heister_icon_safehouse",
+			"heister_icon_fbi",
+		},
+		value = DiscordRichPresenceMod.settings.heister_icon,
+		menu_id = menu_id,
+		priority = 6,
+	})
+	-- Will implement later
+	--[[
+	MenuHelper:AddToggle({
+		id = "use_rpd_string",
+		title = "menu_use_rpd_string",
+		desc = "menu_use_rpd_string_desc",
+		callback = "drp_toggle_callback",
+		value = DiscordRichPresenceMod.settings.use_rpd_string,
+		menu_id = menu_id,
+		priority = 3,
+	})
+	--]]
+	MenuHelper:AddToggle({
+		id = "use_overhaul_tag",
+		title = "menu_use_overhaul_tag",
+		desc = "menu_use_overhaul_tag_desc",
+		callback = "drp_toggle_callback",
+		value = DiscordRichPresenceMod.settings.use_overhaul_tag,
+		menu_id = menu_id,
+	})	
+
+	nodes[menu_id] = MenuHelper:BuildMenu(menu_id)
+
+	MenuHelper:AddMenuItem(nodes["blt_options"], menu_id, "menu_DiscordRichPresenceMod")
+end)
