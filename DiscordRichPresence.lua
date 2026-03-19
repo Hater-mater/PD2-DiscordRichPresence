@@ -261,16 +261,3 @@ function WinPlatformManager:update_discord_heist()
         Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
 	end
 end
-
---[[ Branch, car shop, go bank, Alesso, trans harbor, trans park, 
-Hostile
-Counterfeit Heat Street No mercy
-Mid ranch
-Firestarter 
-Dragon heist Ukrainian prsioner
-Beneath Birth BorderMeth Breakfast Brooklyn bank 
-Yacht
-Big bank DaDiamond
-Election Biker heist
-Black cat Buluc Four stores Goat Nightclub San Martion Stealing xmas 
---]]
