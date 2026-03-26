@@ -5,12 +5,57 @@ _G.DiscordRichPresenceMod = {
 	settings = {
 		heister_icon = 1,
 		use_overhaul_tag = true,
-		--use_rpd_string = false, -- Will make compatibility later
+		use_rpd_string = false,
 	},
 }
 
+-- Define different difficulty showcase table here
+local difficulty_showcase_stars = {
+	"",
+	"☆☆☆☆☆☆",
+	"★☆☆☆☆☆",
+	"★★☆☆☆☆",
+	"★★★☆☆☆",
+	"★★★★☆☆",
+	"★★★★★☆",
+	"★★★★★★"
+}
+
+if _G.Eclipse then
+	difficulty_showcase_stars = {
+		"",
+		"☆☆☆☆",
+		"★☆☆☆",
+		"★★☆☆",
+		"★★★☆",
+		"★★★★",
+		"★★★★",
+		"★★★★",
+	}
+elseif _G.NQR then
+	difficulty_showcase_stars = {
+		"",
+		"☆☆☆",
+		"★☆☆",
+		"★★☆",
+		"★★★",
+		"★★★",
+		"★★★",
+		"★★★"
+	}
+end
+
+local suffixList = {
+	"_prof$",
+	"_day$",
+	"_night$",
+	"_wrapper$"
+}
+local ignoreSuffix = {
+	["election_day"] = true
+}
+
 local vanilla_heists = {
-	"no_briefheist",
 	"jewelry_store",
 	"four_stores",
 	"nightclub",
@@ -107,8 +152,12 @@ function DiscordRichPresenceMod:InitDiscord()
 	Discord:set_start_time(0)
 end
 
-function DiscordRichPresenceMod:SetDiscordPresence(desc, game_status)
-	Discord:set_status(tostring(game_status), tostring(desc))
+function DiscordRichPresenceMod:SetDiscordPresence(desc, game_status, state)
+	if _G.DiscordRichPresenceMod.settings.use_rpd_string and _G.RichPresenceDefinitive then
+		DiscordRichPresenceMod:BuildStatusFromRPD(state)
+	else
+		Discord:set_status(tostring(game_status), tostring(desc))
+	end
 end
 
 function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
@@ -133,7 +182,7 @@ function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
 			--Workaround for Election Day
 			if id == "heist_election_day" then
 				local level_id = Global.game_settings.level_id				
-				if level_id == "election_day_3_skip1" or level_id == "election_day_3_skip2" or level_id == "level_election_day_3" then
+				if level_id == "level_election_day_3_skip1" or level_id == "level_election_day_3_skip2" or level_id == "level_election_day_3" then
 					id = id .. "_" .. "3"
 				else
 					id = id .. "_" .. day
@@ -195,12 +244,183 @@ function DiscordRichPresenceMod:set_overhaul_tag()
 	return tag
 end
 
+-- Using RPD settings for building string
+function DiscordRichPresenceMod:BuildStatusFromRPD(state)
+	local RPDC = _G.RichPresenceDefinitive
+			
+	local gap = ""
+	local BRACKET_LEFT_TAG = ""
+	local BRACKET_RIGHT_TAG = ""
+	local BRACKET_LEFT_1 = ""
+	local BRACKET_RIGHT_1 = ""
+	local BRACKET_LEFT_2 = ""
+	local BRACKET_RIGHT_2 = ""
+	local COMA = ""
+	local ONE_DOWN_MOD = ""
+	local whisper_mode = ""
+	local tag_string = ""
+	local steam_mm = ""
+	local difficulty = ""
+	local heist_name = ""
+	local day_string = ""
+	local heist_mode = ""
+	
+	local job_data = ""
+	local job_id = ""
+	
+	if RPDC.settings.steammm_tag and SystemInfo:matchmaking() == Idstring("MM_STEAM") then
+		if RPDC.settings.tag == "" then
+			steam_mm = "Steam MM"
+		else
+			steam_mm = " Steam MM"
+		end
+	end
+
+	if string.len(tostring(RPDC.settings.days)) > 1 then
+		gap = " "
+	end	
+	
+	if RPDC.settings.bracket_tag then
+		BRACKET_LEFT_TAG = RPDC.settings.bracket1
+		BRACKET_RIGHT_TAG = RPDC.settings.bracket2
+	end
+
+	if RPDC.settings.bracket_days then
+		BRACKET_LEFT_1 = RPDC.settings.bracket1
+		BRACKET_RIGHT_1 = RPDC.settings.bracket2
+
+	end
+
+	if RPDC.settings.bracket_diffs then
+		BRACKET_LEFT_2 = RPDC.settings.bracket1
+		BRACKET_RIGHT_2 = RPDC.settings.bracket2
+	end
+
+	if RPDC.settings.coma ~= "" then
+		COMA = " "..RPDC.settings.coma
+	end
+
+	if Global.game_settings.one_down and RPDC.settings.one_down_mod ~= "" then 
+	    ONE_DOWN_MOD = " "..RPDC.settings.one_down_mod
+	else
+	    ONE_DOWN_MOD = ""
+	end
+	
+	-- OD replacement if playing in Resmod/Eclipse with PJ modifier and OD string is default one
+	if ONE_DOWN_MOD == " OD" and ( _G.Eclipse or _G.SC) then
+		ONE_DOWN_MOD = " PJ"
+	end
+	
+	if RPDC.settings.od_showcase == 2 and Global.game_settings.one_down then
+		ONE_DOWN_MOD = " 🕱"
+	elseif RPDC.settings.od_showcase == 3 and Global.game_settings.one_down then
+		ONE_DOWN_MOD = " 🕶"
+	end	
+	
+	if RPDC.settings.tag_mode == 2 or not _G.DiscordRichPresenceMod.settings.use_overhaul_tag then
+		-- Tag is unused
+	else
+		tag_string = BRACKET_LEFT_TAG..RPDC.settings.tag..steam_mm..BRACKET_RIGHT_TAG.." "
+	end
+	
+	local difficulties_table = {
+		RPDC.settings.ez,
+		RPDC.settings.nrml,
+		RPDC.settings.hrd,
+		RPDC.settings.vh,
+		RPDC.settings.ovk,
+		RPDC.settings.mh,
+		RPDC.settings.dw,
+		RPDC.settings.ds,
+	}		
+
+	-- Different difficulty showcase
+	if RPDC.settings.difficulty_showcase == 2 and difficulty then
+		for i = 1, 8 do
+			difficulties_table[i] = difficulty_showcase_stars[i]
+		end
+	end
+	
+	if state ~= "Main_menu" then
+		job_data = managers.job:current_job_data()
+		job_id = job_data and job_data.name_id or "no_briefheist"
+		job_id = job_id:gsub("heist_", "")
+		job_id = job_id:gsub("_full", "")
+		local cs_active = managers.crime_spree and managers.crime_spree:is_active()
+		local ho_active = managers.skirmish and managers.skirmish:is_skirmish()
+		if cs_active then
+			heist_mode = RPDC.settings.cs..COMA.." "
+		elseif ho_active then
+			heist_mode = RPDC.settings.ho..COMA.." "
+		end
+		
+		if job_id ~= "no_briefheist" then			
+			if #(managers.job:current_job_chain_data() or {}) > 1 then
+				day_string = " "..BRACKET_LEFT_1..RPDC.settings.days..gap..tostring(managers.job:current_stage())..BRACKET_RIGHT_1
+			end
+			if not cs_active then
+				if RPDC.settings.use_save_file ~= 2 then -- Not game loc
+					heist_name = RPDC.settings[job_id]..day_string
+				else -- Game loc
+					heist_name = managers.localization:text(job_data.name_id)..day_string
+				end
+			else
+				local level_id = Global.game_settings.level_id
+				if RPDC.settings.use_save_file ~= 2 then -- Not game loc
+					if level_id and not ignoreSuffix[level_id] then
+						for _, suffix in ipairs(suffixList) do
+							level_id = level_id:gsub(suffix, "")
+						end
+					end
+					level_id = "level_"..level_id					
+					heist_name = RPDC.settings[level_id]
+				else -- Game loc
+					local name_id = level_id and _G.tweak_data.levels[level_id] and _G.tweak_data.levels[level_id].name_id
+					if name_id then
+						heist_name = managers.localization:text(name_id) or heist_name
+					end
+				end
+			end
+			if not ho_active and not cs_active then
+				difficulty = tweak_data:difficulty_to_index(Global.game_settings and Global.game_settings.difficulty or 2)
+				difficulty = " "..BRACKET_LEFT_2..difficulties_table[difficulty]..ONE_DOWN_MOD..BRACKET_RIGHT_2
+			elseif cs_active then
+				difficulty = " ("..RPDC.settings.cs_rank.." "..tostring(managers.crime_spree:server_spree_level())..")"				
+			end
+		else
+			heist_name = managers.localization:text("discord_rp_noheist_string")
+		end
+		
+		if RPDC.settings.game_state_status and (state == "MPPlaying" or state == "SPPlaying") then
+			if managers.groupai:state():whisper_mode() then
+				whisper_state = RPDC.settings.game_state_stealth..": "
+			else
+				whisper_state = RPDC.settings.game_state_loud..": "
+			end
+		end
+	end
+	
+	if state == "MPPlaying" or state == "SPPlaying" then
+		Discord:set_status(RPDC.settings.ingame, tag_string..whisper_state..heist_mode..heist_name..COMA..difficulty)
+	elseif state == "MPLobby" then
+		Discord:set_status(RPDC.settings.lobby, tag_string..heist_mode..heist_name..COMA..difficulty)
+	elseif state == "SPEnd" or state == "MPEnd" then
+		Discord:set_status(RPDC.settings.payday, tag_string..heist_mode..heist_name..COMA..difficulty)
+	elseif state == "Main_menu" then
+		Discord:set_status(RPDC.settings.menu, tag_string)
+	elseif state == "Preplanning" then
+		Discord:set_status(RPDC.settings.preplanning, tag_string..heist_mode..heist_name..COMA..difficulty)
+	end
+end
+
 if Hooks then
 	Hooks:Add("SetupInitManagers", "PostInitManager_DiscordRichPresenceMod", function()
 		DiscordRichPresenceMod:InitDiscord()
 	end)
 end
 
+
+-- Mod menu and loc stuff
 Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)		
 	LocalizationManager:add_localized_strings({
 		-- Strings for Discord
@@ -228,7 +448,7 @@ Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)
 		menu_use_rpd_string_desc = "Discord Rich Presence will show your status generated by RPD mod.",
 		
 		menu_use_overhaul_tag = "Overhaul Tag",
-		menu_use_overhaul_tag_desc = "Show overhaul tag in Discord Rich Presence.",
+		menu_use_overhaul_tag_desc = "Show overhaul tag in Discord Rich Presence. Affect tag showcase from RPD mod too.",
 	})
 	
 	if Idstring("russian"):key() == SystemInfo:language():key() then
@@ -244,21 +464,21 @@ Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)
 			-- Menu strings
 			menu_DiscordRichPresenceMod = "Discord Rich Presence",
 			
-			menu_heister_icon_multiple_choice = "Heister Icon",
-			menu_heister_icon_multiple_choice_desc = "Choose which heister icon style will be presented in Discord Rich Presence",
+			menu_heister_icon_multiple_choice = "Иконка грабителя",
+			menu_heister_icon_multiple_choice_desc = "Выберите каким стилем будет отображаться иконка грабителя Вашего выбранного персонажа в Discord Rich Presence",
 			--heister_icon_vanilla = "Vanilla",
-			heister_icon_vanilla_masks = "Masks",
-			heister_icon_polaroid_v1 = "Polaroid Masked",
-			heister_icon_polaroid_v2 = "Polaroid Unmasked",
-			heister_icon_colored = "Colored Masks",
-			heister_icon_safehouse = "Safehouse Icons",
-			heister_icon_fbi = "FBI Files Sketches",
+			heister_icon_vanilla_masks = "Маски",
+			heister_icon_polaroid_v1 = "Полароид с масками",
+			heister_icon_polaroid_v2 = "Полароид без масок",
+			heister_icon_colored = "Цветные маски",
+			heister_icon_safehouse = "Иконки сейфхауса",
+			heister_icon_fbi = "Скетчи из файлов FBI",
 			
-			menu_use_rpd_string = "Build Discord RP string by using RPD string",
-			menu_use_rpd_string_desc = "Discord Rich Presence will show your status generated by RPD mod.",
+			menu_use_rpd_string = "Использовать настройки RPD для Discord RP",
+			menu_use_rpd_string_desc = "Discord Rich Presence будет использовать настройки из мода Rich Presence Definitive.",
 			
-			menu_use_overhaul_tag = "Overhaul Tag",
-			menu_use_overhaul_tag_desc = "Show overhaul tag in Discord Rich Presence.",
+			menu_use_overhaul_tag = "Тэг оверхалов",
+			menu_use_overhaul_tag_desc = "Показывать тег оверхала, в который Вы сейчас играете. Влияет на отображение тега от Rich Presence Definitive тоже.",
 		})
 	end
 end)
@@ -321,8 +541,7 @@ Hooks:Add("MenuManagerBuildCustomMenus", "MenuManagerBuildCustomMenusDiscordRich
 		menu_id = menu_id,
 		priority = 6,
 	})
-	-- Will implement later
-	--[[
+	
 	MenuHelper:AddToggle({
 		id = "use_rpd_string",
 		title = "menu_use_rpd_string",
@@ -332,7 +551,6 @@ Hooks:Add("MenuManagerBuildCustomMenus", "MenuManagerBuildCustomMenusDiscordRich
 		menu_id = menu_id,
 		priority = 3,
 	})
-	--]]
 	MenuHelper:AddToggle({
 		id = "use_overhaul_tag",
 		title = "menu_use_overhaul_tag",
