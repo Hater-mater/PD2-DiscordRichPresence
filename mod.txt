@@ -3,7 +3,7 @@
 	"description": "Custom PD2 Discord Rich Presence",
 	"author": "Hater",
 	"contact": "hater_mater in Discord",
-	"version": "1.1",
+	"version": "1.11",
 	"blt_version": 2,
 	"image": "thefan.png",
 	"hooks": [

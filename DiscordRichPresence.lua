@@ -240,7 +240,7 @@ function WinPlatformManager:update_discord_heist()
 			DRP:SetLargeImage(job_id, job_name, true, day_number)
 		end
 
-        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("discord_rp_lobby_string"))
+        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("discord_rp_lobby_string"), name)
         Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
 	end
 end

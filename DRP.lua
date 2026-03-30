@@ -181,8 +181,9 @@ function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
 		if day then
 			--Workaround for Election Day
 			if id == "heist_election_day" then
-				local level_id = Global.game_settings.level_id				
-				if level_id == "level_election_day_3_skip1" or level_id == "level_election_day_3_skip2" or level_id == "level_election_day_3" then
+				local level_id = Global.game_settings.level_id
+				--log("level_id is "..tostring(level_id))
+				if level_id:find("election_day_3") then
 					id = id .. "_" .. "3"
 				else
 					id = id .. "_" .. day
@@ -360,7 +361,11 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 			end
 			if not cs_active then
 				if RPDC.settings.use_save_file ~= 2 then -- Not game loc
-					heist_name = RPDC.settings[job_id]..day_string
+					if job_id ~= "crojob2" then -- I fucking love LGL (no)
+						heist_name = RPDC.settings[job_id]..day_string
+					else
+						heist_name = RPDC.settings.crojob..day_string
+					end
 				else -- Game loc
 					heist_name = managers.localization:text(job_data.name_id)..day_string
 				end
