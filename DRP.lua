@@ -361,10 +361,12 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 			end
 			if not cs_active then
 				if RPDC.settings.use_save_file ~= 2 then -- Not game loc
-					if job_id ~= "crojob2" then -- I fucking love LGL (no)
+					if job_id ~= "crojob2" and job_id ~= "tag" then -- I fucking love LGL (no)
 						heist_name = RPDC.settings[job_id]..day_string
-					else
+					elseif job_id == "crojob2" then
 						heist_name = RPDC.settings.crojob..day_string
+					elseif job_id == "tag" then
+						heist_name = RPDC.settings.tag_job..day_string
 					end
 				else -- Game loc
 					heist_name = managers.localization:text(job_data.name_id)..day_string
