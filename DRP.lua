@@ -289,7 +289,6 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	if RPDC.settings.bracket_days then
 		BRACKET_LEFT_1 = RPDC.settings.bracket1
 		BRACKET_RIGHT_1 = RPDC.settings.bracket2
-
 	end
 
 	if RPDC.settings.bracket_diffs then
@@ -347,6 +346,7 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 		job_id = job_data and job_data.name_id or "no_briefheist"
 		job_id = job_id:gsub("heist_", "")
 		job_id = job_id:gsub("_full", "")
+		job_id = job_id:gsub("_name", "")
 		local cs_active = managers.crime_spree and managers.crime_spree:is_active()
 		local ho_active = managers.skirmish and managers.skirmish:is_skirmish()
 		if cs_active then
@@ -354,7 +354,6 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 		elseif ho_active then
 			heist_mode = RPDC.settings.ho..COMA.." "
 		end
-		
 		if job_id ~= "no_briefheist" then			
 			if #(managers.job:current_job_chain_data() or {}) > 1 then
 				day_string = " "..BRACKET_LEFT_1..RPDC.settings.days..gap..tostring(managers.job:current_stage())..BRACKET_RIGHT_1
@@ -397,7 +396,7 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 		else
 			heist_name = managers.localization:text("discord_rp_noheist_string")
 		end
-		
+
 		if RPDC.settings.game_state_status and (state == "MPPlaying" or state == "SPPlaying") then
 			if managers.groupai:state():whisper_mode() then
 				whisper_state = RPDC.settings.game_state_stealth..": "
