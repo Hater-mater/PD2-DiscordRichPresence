@@ -65,6 +65,7 @@ local vanilla_heists = {
 	"branchbank_cash",
 	"branchbank",
 	"branchbank_gold",
+	"branchbank_hl",
 	"roberts",
 	"firestarter",
 	"alex",
@@ -161,6 +162,7 @@ function DiscordRichPresenceMod:SetDiscordPresence(desc, game_status, state)
 end
 
 function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
+	log("id is "..tostring(id))
 	if not is_heist then
 		Discord:set_large_image(id, text)
 	else
@@ -347,6 +349,7 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 		job_id = job_id:gsub("heist_", "")
 		job_id = job_id:gsub("_full", "")
 		job_id = job_id:gsub("_name", "")
+		job_id = job_id:gsub("_hl", "")
 		local cs_active = managers.crime_spree and managers.crime_spree:is_active()
 		local ho_active = managers.skirmish and managers.skirmish:is_skirmish()
 		if cs_active then
@@ -430,10 +433,6 @@ end
 Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)		
 	LocalizationManager:add_localized_strings({
 		-- Strings for Discord
-		--discord_rp_vanilla_string = "Vanilla",
-		discord_rp_ingame_string = "In-game",
-		discord_rp_lobby_string = "Lobby",
-		discord_rp_preplanning_string = "Preplanning",
 		discord_rp_cs_rank_string = " Rank ",
 		discord_rp_mainmenu_string = "Main Menu",
 		discord_rp_noheist_string = "No Heist Selected",
@@ -460,10 +459,6 @@ Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)
 	if Idstring("russian"):key() == SystemInfo:language():key() then
 		LocalizationManager:add_localized_strings({
 			-- Strings for Discord
-			--discord_rp_vanilla_string = "Ванилла",
-			discord_rp_ingame_string = "В игре",
-			discord_rp_lobby_string = "Лобби",
-			discord_rp_preplanning_string = "Препланнинг",
 			discord_rp_cs_rank_string = " Ранг ",
 			discord_rp_mainmenu_string = "Главное меню",
 			discord_rp_noheist_string = "Ограбление не выбрано",

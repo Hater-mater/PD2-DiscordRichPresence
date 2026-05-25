@@ -152,7 +152,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 		
 		local day_string = get_day_string(crime_spree_active, holdout_active, false)
 
-        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. day_string .. job_difficulty_text, loc:text("discord_rp_ingame_string"), name)
+        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. day_string .. job_difficulty_text, loc:text("menu_lobby_server_state_in_game"), name)
 
 		if playing then
             Discord:set_start_time_relative(0)
@@ -170,7 +170,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 			DRP:SetLargeImage(job_id, job_name, true, day_number)
 		end
 
-        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("discord_rp_lobby_string"), name)
+        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("menu_lobby_server_state_in_lobby"), name)
         Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
     elseif name == "SPEnd" or name == "MPEnd" then
 		local day_string = get_day_string(crime_spree_active, holdout_active, false)
@@ -191,7 +191,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 			DRP:SetLargeImage(job_id, job_name, true, day_number)
 		end
 
-        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. day_string .. job_difficulty_text, loc:text("discord_rp_preplanning_string"), "Preplanning")
+        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. day_string .. job_difficulty_text, loc:text("menu_lobby_server_state_briefing"), "Preplanning")
 
 		if playing then
             Discord:set_start_time_relative(0)
@@ -240,7 +240,7 @@ function WinPlatformManager:update_discord_heist()
 			DRP:SetLargeImage(job_id, job_name, true, day_number)
 		end
 
-        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("discord_rp_lobby_string"), name)
+        DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("menu_lobby_server_state_in_lobby"), name)
         Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
 	end
 end
