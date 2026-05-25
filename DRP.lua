@@ -162,7 +162,6 @@ function DiscordRichPresenceMod:SetDiscordPresence(desc, game_status, state)
 end
 
 function DiscordRichPresenceMod:SetLargeImage(id, text, is_heist, day)
-	log("id is "..tostring(id))
 	if not is_heist then
 		Discord:set_large_image(id, text)
 	else
