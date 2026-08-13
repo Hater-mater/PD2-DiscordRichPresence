@@ -236,6 +236,9 @@ function DiscordRichPresenceMod:set_overhaul_tag()
 	-- NQR
 	elseif _G.NQR then
 		tag = "NQR"
+	-- Fray
+	elseif _G.PD2FRAY then
+		tag = "Fray"
 	end
 	
 	-- Nuke tag if no overhaul detected
@@ -261,7 +264,6 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	local ONE_DOWN_MOD = ""
 	local whisper_mode = ""
 	local tag_string = ""
-	local steam_mm = ""
 	local difficulty = ""
 	local heist_name = ""
 	local day_string = ""
@@ -270,13 +272,6 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	local job_data = ""
 	local job_id = ""
 	
-	if RPDC.settings.steammm_tag and SystemInfo:matchmaking() == Idstring("MM_STEAM") then
-		if RPDC.settings.tag == "" then
-			steam_mm = "Steam MM"
-		else
-			steam_mm = " Steam MM"
-		end
-	end
 
 	if string.len(tostring(RPDC.settings.days)) > 1 then
 		gap = " "
@@ -321,7 +316,7 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	if RPDC.settings.tag_mode == 2 or not _G.DiscordRichPresenceMod.settings.use_overhaul_tag then
 		-- Tag is unused
 	else
-		tag_string = BRACKET_LEFT_TAG..RPDC.settings.tag..steam_mm..BRACKET_RIGHT_TAG.." "
+		tag_string = BRACKET_LEFT_TAG..RPDC.settings.tag..BRACKET_RIGHT_TAG.." "
 	end
 	
 	local difficulties_table = {
