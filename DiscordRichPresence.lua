@@ -246,7 +246,3 @@ function WinPlatformManager:update_discord_heist()
         Discord:set_party_size(managers.network:session():amount_of_players(), max_players)
 	end
 end
-
-Hooks:PostHook(WinPlatformManager, "set_rich_presence", "set_rich_presence_drp", function(self, key, value)
-    self:set_rich_presence_discord(self._current_rich_presence)
-end)
