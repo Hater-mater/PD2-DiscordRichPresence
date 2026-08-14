@@ -145,14 +145,15 @@ local vanilla_heists = {
 	"corp",
 	"deep"
 }
-
+-- Not working on x64, smh
+--[[
 function DiscordRichPresenceMod:InitDiscord()	
 	Discord:set_large_image("jerome", "Jerome")
 	Discord:set_small_image("like", "DRP init")
 	
 	Discord:set_start_time(0)
 end
-
+--]]
 function DiscordRichPresenceMod:SetDiscordPresence(desc, game_status, state)
 	if _G.DiscordRichPresenceMod.settings.use_rpd_string and _G.RichPresenceDefinitive then
 		DiscordRichPresenceMod:BuildStatusFromRPD(state)
@@ -264,6 +265,7 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	local ONE_DOWN_MOD = ""
 	local whisper_mode = ""
 	local tag_string = ""
+	local steam_mm = ""
 	local difficulty = ""
 	local heist_name = ""
 	local day_string = ""
@@ -272,6 +274,14 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	local job_data = ""
 	local job_id = ""
 	
+	
+	if RPDC.settings.steammm_tag and IS_STEAM_MM then
+		if RPDC.settings.tag == "" then
+			steam_mm = "Steam MM"
+		else
+			steam_mm = " Steam MM"
+		end
+	end
 
 	if string.len(tostring(RPDC.settings.days)) > 1 then
 		gap = " "
@@ -316,7 +326,7 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 	if RPDC.settings.tag_mode == 2 or not _G.DiscordRichPresenceMod.settings.use_overhaul_tag then
 		-- Tag is unused
 	else
-		tag_string = BRACKET_LEFT_TAG..RPDC.settings.tag..BRACKET_RIGHT_TAG.." "
+		tag_string = BRACKET_LEFT_TAG..RPDC.settings.tag..steam_mm..BRACKET_RIGHT_TAG.." "
 	end
 	
 	local difficulties_table = {
@@ -415,13 +425,13 @@ function DiscordRichPresenceMod:BuildStatusFromRPD(state)
 		Discord:set_status(RPDC.settings.preplanning, tag_string..heist_mode..heist_name..COMA..difficulty)
 	end
 end
-
+--[[
 if Hooks then
 	Hooks:Add("SetupInitManagers", "PostInitManager_DiscordRichPresenceMod", function()
 		DiscordRichPresenceMod:InitDiscord()
 	end)
 end
-
+--]]
 
 -- Mod menu and loc stuff
 Hooks:Add("LocalizationManagerPostInit", "drp_loc_init", function(...)		

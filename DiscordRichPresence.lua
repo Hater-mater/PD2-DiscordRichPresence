@@ -94,7 +94,6 @@ local function get_day_string(crime_spree_active, holdout_active, for_large_imag
 	end	
 end
 
--- TODO: Clean-up this function after mod release because I got tired while resolving all bullshit with discord rich presence assets shenanigans
 function WinPlatformManager:set_rich_presence_discord(name)
 	local DRP = _G.DiscordRichPresenceMod
 	
@@ -130,6 +129,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 	end
 	
 	local num_players = 0
+	local max_players = _G.tweak_data and _G.tweak_data.max_players or 4
 	
 	if name == "MPPlaying" or name == "SPPlaying" then
 		if managers and managers.network then
@@ -159,7 +159,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
         end
 
         if name == "MPPlaying" then
-			Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
+			Discord:set_party_size(managers.network:session():amount_of_players(), max_players)
 		end		
     elseif name == "MPLobby" then        
 		local job_difficulty_text = get_difficulty_text(crime_spree_active, holdout_active, job_name)
@@ -171,7 +171,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
 		end
 
         DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("menu_lobby_server_state_in_lobby"), name)
-        Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
+        Discord:set_party_size(managers.network:session():amount_of_players(), max_players)
     elseif name == "SPEnd" or name == "MPEnd" then
 		local day_string = get_day_string(crime_spree_active, holdout_active, false)
 
@@ -198,7 +198,7 @@ function WinPlatformManager:set_rich_presence_discord(name)
         end
 
         if name == "MPPlaying" then
-			Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
+			Discord:set_party_size(managers.network:session():amount_of_players(), max_players)
 		end
     end
 end
@@ -231,6 +231,8 @@ function WinPlatformManager:update_discord_heist()
 		holdout_active = true
 	end
 	
+	local max_players = _G.tweak_data and _G.tweak_data.max_players or 4
+	
 	if name == "MPLobby" then
         local job_difficulty_text = get_difficulty_text(false, holdout_active, job_name)
 		
@@ -241,6 +243,10 @@ function WinPlatformManager:update_discord_heist()
 		end
 
         DRP:SetDiscordPresence(tag_whisper_string .. job_name .. job_difficulty_text, loc:text("menu_lobby_server_state_in_lobby"), name)
-        Discord:set_party_size(managers.network:session():amount_of_players(), _G.tweak_data.max_players)
+        Discord:set_party_size(managers.network:session():amount_of_players(), max_players)
 	end
 end
+
+Hooks:PostHook(WinPlatformManager, "set_rich_presence", "set_rich_presence_drp", function(self, key, value)
+    self:set_rich_presence_discord(self._current_rich_presence)
+end)
